@@ -7,6 +7,7 @@ gpio.mode(sw2,gpio.INT,gpio.PULLUP)
 gpio.mode(sw3,gpio.INT,gpio.PULLUP)
 gpio.mode(sw4,gpio.INT,gpio.PULLUP)
 
+
 local meuid = "A20"
 local m = mqtt.Client("clientid " .. meuid, 120)
 

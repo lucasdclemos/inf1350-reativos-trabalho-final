@@ -167,6 +167,11 @@ function verifica_jogada_peca_comum()
 end
   
 function come_peca_comum()
+  if jogador == 0 then
+    outro_jogador = 1
+  else
+    outro_jogador = 0
+  end
   dif_x = x_escolhendo_jogada - x_escolhendo_peca
   dif_y = y_escolhendo_jogada - y_escolhendo_peca
   if x_escolhendo_jogada + dif_x <= 8 and x_escolhendo_jogada + dif_x >= 1 and y_escolhendo_jogada + dif_y <= 8 and y_escolhendo_jogada + dif_y >= 1 then
@@ -177,14 +182,30 @@ function come_peca_comum()
     end
     x_escolhendo_jogada = x_escolhendo_jogada + dif_x
     y_escolhendo_jogada = y_escolhendo_jogada + dif_y
+    if x_escolhendo_jogada + dif_x <= 8 and x_escolhendo_jogada + dif_x >= 1 and y_escolhendo_jogada + dif_y <= 8 and y_escolhendo_jogada + dif_y >= 1 then
+      if tabuleiro[x_escolhendo_jogada + dif_x][y_escolhendo_jogada + dif_y] == outro_jogador then 
+        x_escolhendo_peca = x_escolhendo_jogada
+        y_escolhendo_peca = y_escolhendo_jogada
+        x_escolhendo_jogada = x_escolhendo_jogada + dif_x
+        y_escolhendo_jogada = y_escolhendo_jogada + dif_y
+        come_peca_comum()
+      elseif tabuleiro[x_escolhendo_jogada + dif_x][y_escolhendo_jogada - dif_y] == outro_jogador then
+        x_escolhendo_peca = x_escolhendo_jogada
+        y_escolhendo_peca = y_escolhendo_jogada
+        x_escolhendo_jogada = x_escolhendo_jogada + dif_x
+        y_escolhendo_jogada = y_escolhendo_jogada - dif_y
+        come_peca_comum()
+      end
+    end
     if jogador == 1 then
       pretas = pretas - 1
-      if (jogador == 0 and x_escolhendo_jogada == 1) or (jogador == 1 and x_escolhendo_jogada == 8) then
+      if x_escolhendo_jogada == 8 then
+        print(x_escolhendo_jogada, y_escolhendo_jogada)
         vira_dama()
       end
     elseif jogador == 0 then
       brancas = brancas - 1
-      if (jogador == 0 and x_escolhendo_jogada == 1) or (jogador == 1 and x_escolhendo_jogada == 8) then
+      if x_escolhendo_jogada == 1 then
         vira_dama()
       end
     end
@@ -212,49 +233,16 @@ function move_peca_comum()
   tabuleiro[x_escolhendo_peca][y_escolhendo_peca] = -1
   x_escolhendo_peca = x_escolhendo_jogada
   y_escolhendo_peca = y_escolhendo_jogada
-  local continua_come = true
-
   if (jogador == 0 and x_escolhendo_jogada == 1) or (jogador == 1 and x_escolhendo_jogada == 8) then
     vira_dama()
-  else
-    while continua_come do
-      local come_outra_peca = false
-      for i = -1, 1, 2 do
-        for j = -1, 1, 2 do
-          local nova_pos_x = x_escolhendo_jogada + i
-          local nova_pos_y = y_escolhendo_jogada + j
-
-          if nova_pos_x >= 1 and nova_pos_x <= 8 and nova_pos_y >= 1 and nova_pos_y <= 8 then
-            if tabuleiro[nova_pos_x][nova_pos_y] == -1 then
-              local meio_x = (x_escolhendo_jogada + nova_pos_x) / 2
-              local meio_y = (y_escolhendo_jogada + nova_pos_y) / 2
-
-              if tabuleiro[meio_x][meio_y] == (1 - jogador) then
-                tabuleiro[meio_x][meio_y] = -1
-                tabuleiro[nova_pos_x][nova_pos_y] = jogador
-                tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] = -1
-
-                x_escolhendo_jogada = nova_pos_x
-                y_escolhendo_jogada = nova_pos_y
-                come_outra_peca = true
-                continua_come = true
-                break
-              end
-            end
-          end
-        end
-        if come_outra_peca then break end
-      end
-      if not come_outra_peca then
-        continua_come = false
-      end
-    end
   end
 end
 
 
 function vira_dama()
-  tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] = tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] + 2
+  if tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] <= 1 then
+    tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] = tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] + 2
+  end
 end
 
 function mqttcb(t,m)
@@ -272,9 +260,9 @@ function love.load()
     for coluna = 1, numColunas, 1 do
       if (linha + coluna) % 2 == 0 then
         if linha <= 3 then
-          tabuleiro[linha][coluna] = 1
+          tabuleiro[linha][coluna] = -1 -- 1
         elseif linha >= numLinhas - 2 then
-          tabuleiro[linha][coluna] = 0
+          tabuleiro[linha][coluna] = -1 -- 0
         else
           tabuleiro[linha][coluna] = -1
         end
@@ -283,10 +271,10 @@ function love.load()
       end
     end
   end
-  --tabuleiro[4][4] = 0
-  --tabuleiro[5][5] = 0
-  --tabuleiro[6][6] = -1
-  --tabuleiro[3][3] = 3
+  tabuleiro[5][5] = 0
+  tabuleiro[6][6] = -1
+  tabuleiro[7][7] = 0
+  tabuleiro[4][4] = 1
   mqtt_client = mqtt.client.create("139.82.100.100", 7981, mqttcb)
   mqtt_client:connect("cliente love A20")
   mqtt_client:subscribe({"paraloveA20"})
