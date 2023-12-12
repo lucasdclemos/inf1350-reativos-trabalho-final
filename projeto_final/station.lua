@@ -1,7 +1,7 @@
 -- wifi id e senha
 wificonf = {
-  ssid = "Reativos",
-  pwd = "reativos",
+  ssid = "",
+  pwd = "",
   save = false,
   got_ip_cb = function (con)
                 print (con.IP)
