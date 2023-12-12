@@ -1,8 +1,10 @@
---local mqtt = require("mqtt_library")
-
+local mqtt = require("mqtt_library")
+local estado = 0 -- 0 = Escolha da peça / 1 = Escolha da Jogada
 local jogador = 1 -- 1 (branco) - 0 (preto)
 local numLinhas = 8
 local numColunas = 8
+local linha = 0
+local coluna = 0
 local tamanhoCasa = 64
 local destaque_x
 local destaque_y
@@ -13,27 +15,61 @@ local escolhendo_peca = 0
 -- Peça branca - 1
 -- Peça preta - 0
 -- Desocupado - -1
-tabuleiro = {}
+local tabuleiro = {}
 
-function controller(msg)
-  if msg == "1" then
-    verifica_tabuleiro(destaque_x - 1, destaque_y - 1)
-  elseif msg == "2" then
-    verifica_tabuleiro(destaque_x - 1, destaque_y + 1)
-  elseif msg == "3" then
-    verifica_tabuleiro(destaque_x + 1, destaque_y - 1)
+
+function muda_linha()
+  if linha < 7 then
+    linha = linha + 1
   else
-    verifica_tabuleiro(destaque_x + 1, destaque_y + 1)
+    linha = 0
   end
 end
 
-function posicao_confirmada() then
+function muda_coluna()
+  if coluna < 7 then
+    coluna = coluna + 1
+  else
+    coluna = 0
+  end
+end
+
+function confirma_peca()
+  print("OI")
+  if jogador == tabuleiro[linha][coluna] then
+    estado = 1
+    print("Mudou ESTADO")
+  end
+end
+
+function controller(msg)
+  if msg == "1" then
+    --verifica_tabuleiro(destaque_x - 1, destaque_y - 1)
+      if estado == 0 then
+        print(linha)
+        muda_linha()
+      end
+  elseif msg == "2" then
+      if estado == 0 then
+        muda_coluna()
+      end
+    --verifica_tabuleiro(destaque_x - 1, destaque_y + 1)
+  elseif msg == "3" then
+    if estado == 0 then
+      confirma_peca()
+    --verifica_tabuleiro(destaque_x + 1, destaque_y - 1)
+    end
+  else
+    --verifica_tabuleiro(destaque_x + 1, destaque_y + 1)
+  end
+end
+
+--function posicao_confirmada() then
   
 
 
 function mqttcb(t,m)
-  if(t == "paraloveA14") then
-  
+  if(t == "paraloveA20") then
   end
   print("MENSAGEM RECEBIDA: "..m)
   controller(m)
@@ -73,6 +109,10 @@ function love.load()
             end
         end
     end
+    mqtt_client = mqtt.client.create("139.82.100.100", 7981, mqttcb)
+  -- Trocar XX pelo ID da etiqueta do seu NodeMCU
+    mqtt_client:connect("cliente love A20")
+    mqtt_client:subscribe({"paraloveA20"})
 end
 
 function love.draw()
@@ -126,6 +166,6 @@ function love.draw()
     end
 end
 
---function love.update(dt)
---  mqtt_client:handler()
---end
+function love.update(dt)
+  mqtt_client:handler()
+end

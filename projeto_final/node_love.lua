@@ -1,15 +1,17 @@
 local sw1 = 3
 local sw2 = 4
 local sw3 = 5
+local sw4 = 8
 gpio.mode(sw1,gpio.INT,gpio.PULLUP)
 gpio.mode(sw2,gpio.INT,gpio.PULLUP)
 gpio.mode(sw3,gpio.INT,gpio.PULLUP)
+gpio.mode(sw4,gpio.INT,gpio.PULLUP)
 
-local meuid = "A14"
+local meuid = "A20"
 local m = mqtt.Client("clientid " .. meuid, 120)
 
 function publica(c,chave)
-  c:publish("paraloveA14",chave,0,0, 
+  c:publish("paraloveA20",chave,0,0, 
             function(client) print("mandou! "..chave) end)
 end
 
@@ -25,7 +27,7 @@ end
 
 
 function conectado (client)
-  client:subscribe("paranodeA14", 0, novaInscricao)
+  client:subscribe("paranodeA20", 0, novaInscricao)
   function nodeBotao1(level,timestamp)
     gpio.trig(sw1)
     publica(client,1)
@@ -55,6 +57,16 @@ function conectado (client)
             end)
   end
   gpio.trig(sw3, "down", nodeBotao3)
+  
+  function nodeBotao4(level,timestamp)
+    gpio.trig(sw4)
+    publica(client,4)
+    tmr.create():alarm(200, tmr.ALARM_SINGLE,
+            function(t)
+                gpio.trig(sw4, "down", nodeBotao4)
+            end)
+  end
+  gpio.trig(sw4, "down", nodeBotao4)
   
 end
 
