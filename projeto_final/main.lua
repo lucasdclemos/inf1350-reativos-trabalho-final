@@ -212,10 +212,46 @@ function move_peca_comum()
   tabuleiro[x_escolhendo_peca][y_escolhendo_peca] = -1
   x_escolhendo_peca = x_escolhendo_jogada
   y_escolhendo_peca = y_escolhendo_jogada
+  local continua_come = true
+
   if (jogador == 0 and x_escolhendo_jogada == 1) or (jogador == 1 and x_escolhendo_jogada == 8) then
     vira_dama()
+  else
+    while continua_come do
+      local come_outra_peca = false
+      for i = -1, 1, 2 do
+        for j = -1, 1, 2 do
+          local nova_pos_x = x_escolhendo_jogada + i
+          local nova_pos_y = y_escolhendo_jogada + j
+
+          if nova_pos_x >= 1 and nova_pos_x <= 8 and nova_pos_y >= 1 and nova_pos_y <= 8 then
+            if tabuleiro[nova_pos_x][nova_pos_y] == -1 then
+              local meio_x = (x_escolhendo_jogada + nova_pos_x) / 2
+              local meio_y = (y_escolhendo_jogada + nova_pos_y) / 2
+
+              if tabuleiro[meio_x][meio_y] == (1 - jogador) then
+                tabuleiro[meio_x][meio_y] = -1
+                tabuleiro[nova_pos_x][nova_pos_y] = jogador
+                tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] = -1
+
+                x_escolhendo_jogada = nova_pos_x
+                y_escolhendo_jogada = nova_pos_y
+                come_outra_peca = true
+                continua_come = true
+                break
+              end
+            end
+          end
+        end
+        if come_outra_peca then break end
+      end
+      if not come_outra_peca then
+        continua_come = false
+      end
+    end
   end
 end
+
 
 function vira_dama()
   tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] = tabuleiro[x_escolhendo_jogada][y_escolhendo_jogada] + 2
