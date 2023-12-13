@@ -10,7 +10,12 @@ gpio.mode(sw4,gpio.INT,gpio.PULLUP)
 local meuid = "A18"
 local m = mqtt.Client("clientid " .. meuid, 120)
 
-function publica(c,chave, meuid)
+function publicaA18(c,chave,meuid)
+  c:publish("paraloveA18","A18 "..chave,0,0, 
+            function(client) print("mandou! "..chave) end)
+end
+
+function publicaA20(c,chave,meuid)
   c:publish("paraloveA20","A18 "..chave,0,0, 
             function(client) print("mandou! "..chave) end)
 end
@@ -28,7 +33,8 @@ end
 function conectado (client)
     function nodeBotao1(level,timestamp)
     gpio.trig(sw1)
-    publica(client,1)
+    publicaA18(client,1)
+    publicaA20(client,1)
     tmr.create():alarm(200, tmr.ALARM_SINGLE,
             function(t)
                 gpio.trig(sw1, "down", nodeBotao1)
@@ -38,7 +44,8 @@ function conectado (client)
     
     function nodeBotao2(level,timestamp)
     gpio.trig(sw2)
-    publica(client,2)
+    publicaA18(client,2)
+    publicaA20(client,2)
     tmr.create():alarm(200, tmr.ALARM_SINGLE,
             function(t)
                 gpio.trig(sw2, "down", nodeBotao2)
@@ -48,7 +55,8 @@ function conectado (client)
     
     function nodeBotao3(level,timestamp)
     gpio.trig(sw3)
-    publica(client,3)
+    publicaA18(client,3)
+    publicaA20(client,3)
     tmr.create():alarm(200, tmr.ALARM_SINGLE,
             function(t)
                 gpio.trig(sw3, "down", nodeBotao3)
@@ -58,7 +66,8 @@ function conectado (client)
     
     function nodeBotao4(level,timestamp)
     gpio.trig(sw4)
-    publica(client,4)
+    publicaA18(client,4)
+    publicaA20(client,4)
     tmr.create():alarm(200, tmr.ALARM_SINGLE,
             function(t)
                 gpio.trig(sw4, "down", nodeBotao4)

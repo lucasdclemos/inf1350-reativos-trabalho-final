@@ -14,8 +14,8 @@ local x_escolhendo_jogada = 1
 local y_escolhendo_jogada = 1
 local tabuleiro = {}
 local total_players = 0
-local jogador_branco = "A18"
-local jogado_preto = "A18"
+local jogador_branco
+local jogado_preto
 
 function muda_coluna()
   if estado == 0 then
@@ -275,7 +275,7 @@ function mqttcb(t,m)
       total_players = total_players + 1
     end
   elseif (jogador == 0 and codigo == jogado_preto) or (jogador == 1 and codigo == jogador_branco) then
-        controller(numero)
+    controller(numero)
   end
 end
 
@@ -300,8 +300,8 @@ function love.load()
     end
   end
   mqtt_client = mqtt.client.create("139.82.100.100", 7981, mqttcb)
-  mqtt_client:connect("cliente love A20")
-  mqtt_client:subscribe({"paraloveA20"})
+  mqtt_client:connect("cliente love A18")
+  mqtt_client:subscribe({"paraloveA18"})
 end
 
 function love.draw()
