@@ -7,12 +7,11 @@ gpio.mode(sw2,gpio.INT,gpio.PULLUP)
 gpio.mode(sw3,gpio.INT,gpio.PULLUP)
 gpio.mode(sw4,gpio.INT,gpio.PULLUP)
 
-
-local meuid = "A20"
+local meuid = "A10"
 local m = mqtt.Client("clientid " .. meuid, 120)
 
-function publica(c,chave)
-  c:publish("paraloveA20",chave,0,0, 
+function publica(c,chave, meuid)
+  c:publish("paraloveA20","A20 "..chave,0,0, 
             function(client) print("mandou! "..chave) end)
 end
 
@@ -26,49 +25,47 @@ function novaInscricao (c)
 
 end
 
-
 function conectado (client)
-  client:subscribe("paranodeA20", 0, novaInscricao)
-  function nodeBotao1(level,timestamp)
+    function nodeBotao1(level,timestamp)
     gpio.trig(sw1)
     publica(client,1)
     tmr.create():alarm(200, tmr.ALARM_SINGLE,
             function(t)
                 gpio.trig(sw1, "down", nodeBotao1)
             end)
-  end
-  gpio.trig(sw1, "down", nodeBotao1)
-  
-  function nodeBotao2(level,timestamp)
+    end
+    gpio.trig(sw1, "down", nodeBotao1)
+    
+    function nodeBotao2(level,timestamp)
     gpio.trig(sw2)
     publica(client,2)
     tmr.create():alarm(200, tmr.ALARM_SINGLE,
             function(t)
                 gpio.trig(sw2, "down", nodeBotao2)
             end)
-  end
-  gpio.trig(sw2, "down", nodeBotao2)
-  
-  function nodeBotao3(level,timestamp)
+    end
+    gpio.trig(sw2, "down", nodeBotao2)
+    
+    function nodeBotao3(level,timestamp)
     gpio.trig(sw3)
     publica(client,3)
     tmr.create():alarm(200, tmr.ALARM_SINGLE,
             function(t)
                 gpio.trig(sw3, "down", nodeBotao3)
             end)
-  end
-  gpio.trig(sw3, "down", nodeBotao3)
-  
-  function nodeBotao4(level,timestamp)
+    end
+    gpio.trig(sw3, "down", nodeBotao3)
+    
+    function nodeBotao4(level,timestamp)
     gpio.trig(sw4)
     publica(client,4)
     tmr.create():alarm(200, tmr.ALARM_SINGLE,
             function(t)
                 gpio.trig(sw4, "down", nodeBotao4)
             end)
-  end
-  gpio.trig(sw4, "down", nodeBotao4)
-  
+    end
+    gpio.trig(sw4, "down", nodeBotao4)
+
 end
 
 m:connect("139.82.100.100", 7981, false, 

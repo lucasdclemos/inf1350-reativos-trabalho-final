@@ -1,6 +1,6 @@
 local mqtt = require("mqtt_library")
 local estado = 0 -- 0 = Escolha da peça / 1 = Escolha da Jogada
-local jogador = 1 -- 1 (branco) - 0 (preto)
+local jogador = 0 -- 1 (branco) - 0 (preto)
 local pretas = 12
 local brancas = 12
 local numLinhas = 8
@@ -13,6 +13,9 @@ local y_escolhendo_peca = 1
 local x_escolhendo_jogada = 1
 local y_escolhendo_jogada = 1
 local tabuleiro = {}
+local total_players = 0
+local jogador_branco
+local jogado_preto
 
 function muda_coluna()
   if estado == 0 then
@@ -67,6 +70,17 @@ function controller(msg)
         confirma_jogada_dama()
       end
     end
+--  elseif msg == "4" then
+--    if total_players == 0 then
+--      m = 1
+--      mqtt_client:publish("paranodeA20", m)
+--      total_players = total_players + 1
+--    elseif total_players == 1 then
+--      m = 0
+--      mqtt_client:publish("paranodeA20", m)
+--      total_players = total_players + 1
+--    end
+--  end
   end
 end
 
@@ -246,9 +260,20 @@ function vira_dama()
 end
 
 function mqttcb(t,m)
-  if(t == "paraloveA20") then
+  local codigo, numero = m:match("(%a%d+) (%d+)")
+  print(codigo, numero)
+  if numero == "4" then
+    mqtt_client:publish("paranodeA20", "recebi " .. m)
+    if total_players == 0 then
+      jogador_branco = codigo
+      total_players = total_players + 1
+    elseif total_players == 1 then
+      jogado_preto = codigo
+      total_players = total_players + 1
+    end
+  elseif (jogador == 0 and codigo == jogado_preto) or (jogador == 1 and codigo == jogador_branco) then
+        controller(numero)
   end
-  controller(m)
 end
 
 function love.load()
