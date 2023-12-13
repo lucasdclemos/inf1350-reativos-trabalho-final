@@ -1,6 +1,6 @@
 local mqtt = require("mqtt_library")
 local estado = 0 -- 0 = Escolha da peça / 1 = Escolha da Jogada
-local jogador = 0 -- 1 (branco) - 0 (preto)
+local jogador = 1 -- 1 (branco) - 0 (preto)
 local pretas = 12
 local brancas = 12
 local numLinhas = 8
@@ -14,8 +14,8 @@ local x_escolhendo_jogada = 1
 local y_escolhendo_jogada = 1
 local tabuleiro = {}
 local total_players = 0
-local jogador_branco
-local jogado_preto
+local jogador_branco = "A18"
+local jogado_preto = "A18"
 
 function muda_coluna()
   if estado == 0 then
@@ -227,6 +227,9 @@ function come_peca_comum()
 end
   
 function muda_jogador()
+  if brancas == 0 or pretas == 0 then
+    love.event.quit()
+  end
   if jogador == 1 then
     jogador = 0
     x_escolhendo_peca = 8
@@ -285,9 +288,9 @@ function love.load()
     for coluna = 1, numColunas, 1 do
       if (linha + coluna) % 2 == 0 then
         if linha <= 3 then
-          tabuleiro[linha][coluna] = -1 -- 1
+          tabuleiro[linha][coluna] = 1 -- 1
         elseif linha >= numLinhas - 2 then
-          tabuleiro[linha][coluna] = -1 -- 0
+          tabuleiro[linha][coluna] = 0 -- 0
         else
           tabuleiro[linha][coluna] = -1
         end
@@ -296,10 +299,6 @@ function love.load()
       end
     end
   end
-  tabuleiro[5][5] = 0
-  tabuleiro[6][6] = -1
-  tabuleiro[7][7] = 0
-  tabuleiro[4][4] = 1
   mqtt_client = mqtt.client.create("139.82.100.100", 7981, mqttcb)
   mqtt_client:connect("cliente love A20")
   mqtt_client:subscribe({"paraloveA20"})

@@ -7,11 +7,11 @@ gpio.mode(sw2,gpio.INT,gpio.PULLUP)
 gpio.mode(sw3,gpio.INT,gpio.PULLUP)
 gpio.mode(sw4,gpio.INT,gpio.PULLUP)
 
-local meuid = "A10"
+local meuid = "A18"
 local m = mqtt.Client("clientid " .. meuid, 120)
 
 function publica(c,chave, meuid)
-  c:publish("paraloveA20","A20 "..chave,0,0, 
+  c:publish("paraloveA20","A18 "..chave,0,0, 
             function(client) print("mandou! "..chave) end)
 end
 
